@@ -1,0 +1,1727 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>
+@charset "utf-8";
+
+:root { --bg-primary: #0a0e27; --bg-secondary: #1a1f3a; --bg-card: rgba(26, 31, 58, 0.8); --accent-cyan: #00d4ff; --accent-blue: #0066ff; --accent-purple: #8b5cf6; --accent-gold: #fbbf24; --accent-green: #10b981; --accent-red: #ef4444; --accent-orange: #f97316; --text-primary: #ffffff; --text-secondary: #94a3b8; --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.5); }
+
+* { margin: 0px; padding: 0px; box-sizing: border-box; }
+
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+
+.dashboard { max-width: 1600px; margin: 0px auto; padding: 20px; }
+
+.header { text-align: center; margin-bottom: 30px; }
+
+.header h1 { font-size: 2rem; font-weight: 700; background-image: linear-gradient(90deg, #00d4ff, #8b5cf6, #00d4ff); background-size: 200% auto; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 2px; animation: shimmer 3s linear infinite; }
+
+.header p { color: var(--text-secondary); margin-top: 8px; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+
+.kpi-card { background: var(--bg-card); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; border: 1px solid rgba(0, 212, 255, 0.1); transition: transform 0.3s, box-shadow 0.3s; }
+
+.kpi-card:hover { transform: translateY(-5px); box-shadow: var(--glow-cyan); }
+
+.kpi-card::before { content: ""; position: absolute; top: 0px; left: 0px; right: 0px; height: 3px; }
+
+.kpi-card.cyan::before { background: var(--accent-cyan); }
+
+.kpi-card.blue::before { background: var(--accent-blue); }
+
+.kpi-card.purple::before { background: var(--accent-purple); }
+
+.kpi-card.gold::before { background: var(--accent-gold); }
+
+.kpi-card.green::before { background: var(--accent-green); }
+
+.kpi-card.red::before { background: var(--accent-red); }
+
+.kpi-card.orange::before { background: var(--accent-orange); }
+
+.kpi-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+.kpi-value { font-size: 2rem; font-weight: 700; color: var(--text-primary); }
+
+.kpi-card.cyan .kpi-value { text-shadow: var(--glow-cyan); }
+
+.kpi-card.gold .kpi-value { color: var(--accent-gold); }
+
+.kpi-card.red .kpi-value { color: var(--accent-red); }
+
+.kpi-card.green .kpi-value { color: var(--accent-green); }
+
+.kpi-card.orange .kpi-value { color: var(--accent-orange); }
+
+.kpi-change { font-size: 0.75rem; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+
+.kpi-change.positive { color: var(--accent-green); }
+
+.kpi-change.negative { color: var(--accent-red); }
+
+.kpi-change.neutral { color: var(--text-secondary); }
+
+.charts-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 25px; }
+
+.chart-container { background: var(--bg-card); border-radius: 16px; padding: 20px; border: 1px solid rgba(0, 212, 255, 0.15); }
+
+.chart-title { font-size: 1rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+
+.chart-title::before { content: ""; width: 4px; height: 18px; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple)); border-radius: 2px; }
+
+.model-chart { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; }
+
+.model-bar-item { display: flex; align-items: center; gap: 12px; }
+
+.model-name { width: 100px; font-size: 0.85rem; color: var(--text-secondary); text-align: right; flex-shrink: 0; }
+
+.model-bar-container { flex: 1 1 0%; height: 24px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative; }
+
+.model-bar { height: 100%; border-radius: 4px; transition: width 1s; position: relative; }
+
+.model-bar.cyan { background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); }
+
+.model-bar.blue { background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); }
+
+.model-bar.purple { background: linear-gradient(90deg, var(--accent-purple), var(--accent-gold)); }
+
+.model-qty { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+
+.donut-container { display: flex; justify-content: center; gap: 30px; padding: 20px; flex-wrap: wrap; }
+
+.donut-gauge { position: relative; width: 140px; height: 140px; }
+
+.donut-gauge svg { transform: rotate(-90deg); }
+
+.donut-bg { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 10; }
+
+.donut-progress { fill: none; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset 2s; }
+
+.donut-progress.cyan { stroke: var(--accent-cyan); }
+
+.donut-progress.purple { stroke: var(--accent-purple); }
+
+.donut-progress.gold { stroke: var(--accent-gold); }
+
+.donut-progress.green { stroke: var(--accent-green); }
+
+.donut-progress.orange { stroke: var(--accent-orange); }
+
+.donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+
+.donut-value { font-size: 1.5rem; font-weight: 700; }
+
+.donut-label { font-size: 0.7rem; color: var(--text-secondary); }
+
+.horizontal-bar-chart { display: flex; flex-direction: column; gap: 10px; }
+
+.h-bar-item { display: flex; align-items: center; gap: 10px; }
+
+.h-bar-label { width: 70px; font-size: 0.8rem; color: var(--text-secondary); text-align: right; flex-shrink: 0; }
+
+.h-bar-track { flex: 1 1 0%; height: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; }
+
+.h-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.75rem; font-weight: 600; transition: width 1s; }
+
+.h-bar.cyan { background: linear-gradient(90deg, var(--accent-cyan), transparent); }
+
+.h-bar.blue { background: linear-gradient(90deg, var(--accent-blue), transparent); }
+
+.h-bar.purple { background: linear-gradient(90deg, var(--accent-purple), transparent); }
+
+.h-bar.gold { background: linear-gradient(90deg, var(--accent-gold), transparent); }
+
+.h-bar.green { background: linear-gradient(90deg, var(--accent-green), transparent); }
+
+.h-bar.orange { background: linear-gradient(90deg, var(--accent-orange), transparent); }
+
+.office-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
+
+.office-item { background: rgba(0, 212, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.15); border-radius: 8px; padding: 12px; text-align: center; }
+
+.office-name { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; }
+
+.office-qty { font-size: 1.2rem; font-weight: 700; color: var(--accent-cyan); }
+
+.customer-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+
+.customer-table th, .customer-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+
+.customer-table th { color: var(--text-secondary); font-weight: 500; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
+
+.customer-table tr:hover { background: rgba(0, 212, 255, 0.05); }
+
+.customer-table td:first-child { color: var(--accent-cyan); }
+
+.new-customer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; max-height: 340px; overflow-y: auto; }
+
+.new-cust-card { background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.25); border-radius: 10px; padding: 12px; position: relative; transition: transform 0.2s, border-color 0.2s; }
+
+.new-cust-card:hover { transform: translateY(-2px); border-color: rgba(249, 115, 22, 0.5); }
+
+.new-cust-card .nc-badge { position: absolute; top: 8px; right: 8px; background: var(--accent-orange); color: rgb(255, 255, 255); font-size: 0.6rem; font-weight: 700; padding: 2px 5px; border-radius: 4px; letter-spacing: 0.5px; }
+
+.new-cust-name { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; padding-right: 28px; }
+
+.new-cust-qty { font-size: 1.4rem; font-weight: 700; color: var(--accent-orange); line-height: 1; margin-bottom: 6px; }
+
+.new-cust-qty span { font-size: 0.75rem; font-weight: 400; color: var(--text-secondary); }
+
+.new-cust-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.nc-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); }
+
+.nc-tag.industry { color: var(--accent-cyan); background: rgba(0, 212, 255, 0.1); }
+
+.nc-tag.region-foreign { color: var(--accent-purple); background: rgba(139, 92, 246, 0.1); }
+
+.nc-tag.region-domestic { color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+
+.nc-summary { display: flex; gap: 20px; margin-bottom: 15px; padding: 12px 15px; background: rgba(249, 115, 22, 0.07); border-radius: 8px; border-left: 3px solid var(--accent-orange); flex-wrap: wrap; }
+
+.nc-summary-item { display: flex; flex-direction: column; }
+
+.nc-summary-item .nc-s-val { font-size: 1.3rem; font-weight: 700; color: var(--accent-orange); line-height: 1; }
+
+.nc-summary-item .nc-s-label { font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; }
+
+@keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+@keyframes glowPulse { 
+  0%, 100% { box-shadow: rgba(0, 212, 255, 0.3) 0px 0px 20px; }
+  50% { box-shadow: rgba(0, 212, 255, 0.6) 0px 0px 40px; }
+}
+
+.glow-pulse { animation: 3s ease-in-out 0s infinite normal none running glowPulse; }
+
+.particles { position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: -1; }
+
+.particle { position: absolute; width: 3px; height: 3px; background: var(--accent-cyan); border-radius: 50%; opacity: 0.3; animation: 15s ease 0s infinite normal none running float; }
+
+@keyframes float { 
+  0%, 100% { transform: translateY(100vh); opacity: 0; }
+  10% { opacity: 0.3; }
+  90% { opacity: 0.3; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .header h1 { font-size: 1.5rem; }
+  .charts-section { grid-template-columns: 1fr; }
+  .kpi-value { font-size: 1.5rem; }
+  .model-name { width: 70px; font-size: 0.75rem; }
+}
+
+.yoy-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+
+@media (max-width: 700px) {
+  .yoy-grid { grid-template-columns: 1fr; }
+}
+
+.yoy-card { background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 16px; border: 1px solid rgba(255, 255, 255, 0.08); }
+
+.yoy-card-title { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+.yoy-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 0.85rem; }
+
+.yoy-row:last-child { border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; }
+
+.yoy-row .label { color: var(--text-secondary); }
+
+.yoy-row .val25 { color: rgb(148, 163, 184); }
+
+.yoy-row .val26 { color: var(--accent-cyan); font-weight: 600; }
+
+.yoy-row .delta { font-size: 0.78rem; font-weight: 700; }
+
+.yoy-row .delta.up { color: var(--accent-green); }
+
+.yoy-row .delta.down { color: var(--accent-red); }
+
+.yoy-row .delta.flat { color: var(--text-secondary); }
+
+.foreign-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+
+@media (max-width: 700px) {
+  .foreign-detail { grid-template-columns: 1fr; }
+}
+
+.fd-col-title { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px; text-align: center; padding: 4px 0px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+
+.fd-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 6px; border-radius: 4px; }
+
+.fd-row:hover { background: rgba(255, 255, 255, 0.04); }
+
+.fd-row .fd-cust { color: var(--text-secondary); }
+
+.fd-row .fd-qty { color: var(--accent-cyan); font-weight: 600; }
+
+.fd-row .fd-region { color: var(--accent-purple); font-size: 0.72rem; }
+
+.analysis-block { display: flex; flex-direction: column; gap: 12px; }
+
+.analysis-item { display: flex; gap: 14px; padding: 14px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; border-left: 3px solid var(--accent-cyan); }
+
+.analysis-item.warn { border-left-color: var(--accent-red); }
+
+.analysis-item.ok { border-left-color: var(--accent-green); }
+
+.analysis-item.note { border-left-color: var(--accent-gold); }
+
+.analysis-icon { font-size: 1.4rem; flex-shrink: 0; line-height: 1.4; }
+
+.analysis-body { }
+
+.analysis-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+
+.analysis-desc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; }
+
+.analysis-desc strong { color: var(--accent-gold); font-weight: 600; }
+
+</style>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海天智联磁力模板订单数据可视化 - 2026年4月</title>
+
+</head>
+<body>
+
+<div class="particles" id="particles"><div class="particle" style="left: 73.0092%; animation-delay: 13.1191s; animation-duration: 13.2867s;"></div><div class="particle" style="left: 62.4324%; animation-delay: 7.74566s; animation-duration: 10.6334s;"></div><div class="particle" style="left: 8.42165%; animation-delay: 8.66953s; animation-duration: 16.1549s;"></div><div class="particle" style="left: 40.7197%; animation-delay: 10.5349s; animation-duration: 14.5479s;"></div><div class="particle" style="left: 65.6998%; animation-delay: 12.6602s; animation-duration: 11.7272s;"></div><div class="particle" style="left: 21.7299%; animation-delay: 2.51812s; animation-duration: 16.4066s;"></div><div class="particle" style="left: 4.68364%; animation-delay: 13.352s; animation-duration: 19.0093s;"></div><div class="particle" style="left: 88.9904%; animation-delay: 13.4269s; animation-duration: 19.3485s;"></div><div class="particle" style="left: 71.8746%; animation-delay: 9.58098s; animation-duration: 14.5344s;"></div><div class="particle" style="left: 31.0117%; animation-delay: 14.7177s; animation-duration: 16.8637s;"></div><div class="particle" style="left: 20.6393%; animation-delay: 2.30484s; animation-duration: 14.7622s;"></div><div class="particle" style="left: 42.2996%; animation-delay: 3.07076s; animation-duration: 11.1992s;"></div><div class="particle" style="left: 3.58936%; animation-delay: 3.06495s; animation-duration: 11.0672s;"></div><div class="particle" style="left: 42.3045%; animation-delay: 8.20331s; animation-duration: 17.6714s;"></div><div class="particle" style="left: 76.0741%; animation-delay: 4.48382s; animation-duration: 12.1404s;"></div><div class="particle" style="left: 84.7525%; animation-delay: 11.3055s; animation-duration: 19.5959s;"></div><div class="particle" style="left: 89.3727%; animation-delay: 13.0708s; animation-duration: 19.2326s;"></div><div class="particle" style="left: 70.7548%; animation-delay: 5.39941s; animation-duration: 10.7843s;"></div><div class="particle" style="left: 34.5443%; animation-delay: 2.49613s; animation-duration: 17.341s;"></div><div class="particle" style="left: 12.4401%; animation-delay: 0.406441s; animation-duration: 12.2441s;"></div></div>
+
+<div class="dashboard">
+  <header class="header">
+    <h1>海天智联磁力模板</h1>
+    <p>2026年4月销售数据可视化</p>
+  </header>
+
+  <!-- KPI Cards -->
+  <section class="kpi-grid">
+    <div class="kpi-card cyan glow-pulse">
+      <div class="kpi-label">月度总销量</div>
+      <div class="kpi-value" data-target="85">85</div>
+      <div class="kpi-change negative">
+        <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 8L1 2H9L5 8Z" fill="currentColor"></path></svg>
+        <span>同比 -11.5%</span>
+      </div>
+    </div>
+    
+    <div class="kpi-card blue">
+      <div class="kpi-label">订单数量</div>
+      <div class="kpi-value" data-target="55">55</div>
+    </div>
+    
+    <div class="kpi-card purple">
+      <div class="kpi-label">型号种类</div>
+      <div class="kpi-value" data-target="34">34</div>
+      <div class="kpi-change neutral">共34种型号</div>
+    </div>
+    
+    <div class="kpi-card gold">
+      <div class="kpi-label">客户数量</div>
+      <div class="kpi-value" data-target="27">27</div>
+    </div>
+    
+    <div class="kpi-card green">
+      <div class="kpi-label">外贸台量</div>
+      <div class="kpi-value" data-target="23">23</div>
+      <div class="kpi-change neutral">占比27.1% &nbsp;|&nbsp; 同比持平</div>
+    </div>
+
+    <div class="kpi-card orange">
+      <div class="kpi-label">本月新客户</div>
+      <div class="kpi-value" data-target="3">3</div>
+      <div class="kpi-change neutral">贡献9台</div>
+    </div>
+  </section>
+
+  <!-- Charts Row 1 -->
+  <section class="charts-section">
+    <!-- Model Sales Bar Chart -->
+    <div class="chart-container">
+      <div class="chart-title">型号销量排行</div>
+      <div class="model-chart" id="modelChart">
+      <div class="model-bar-item">
+        <span class="model-name">HQP 140HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar cyan" style="width: 100%;" data-width="100.0">
+            <span class="model-qty">8台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 012HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 75%;" data-width="75.0">
+            <span class="model-qty">6台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 180HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar purple" style="width: 75%;" data-width="75.0">
+            <span class="model-qty">6台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 100HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 75%;" data-width="75.0">
+            <span class="model-qty">6台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 047HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 62.5%;" data-width="62.5">
+            <span class="model-qty">5台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 130HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 50%;" data-width="50.0">
+            <span class="model-qty">4台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 028HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 50%;" data-width="50.0">
+            <span class="model-qty">4台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 240HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 50%;" data-width="50.0">
+            <span class="model-qty">4台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 020HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 50%;" data-width="50.0">
+            <span class="model-qty">4台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 210HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 37.5%;" data-width="37.5">
+            <span class="model-qty">3台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 330HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 37.5%;" data-width="37.5">
+            <span class="model-qty">3台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 016HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 25%;" data-width="25.0">
+            <span class="model-qty">2台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 160HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 25%;" data-width="25.0">
+            <span class="model-qty">2台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 280HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 25%;" data-width="25.0">
+            <span class="model-qty">2台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 120HD-SE</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 25%;" data-width="25.0">
+            <span class="model-qty">2台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 053HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 25%;" data-width="25.0">
+            <span class="model-qty">2台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 038HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 25%;" data-width="25.0">
+            <span class="model-qty">2台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 032HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 25%;" data-width="25.0">
+            <span class="model-qty">2台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">WU8 1850T</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 25%;" data-width="25.0">
+            <span class="model-qty">2台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">SQP 026HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 25%;" data-width="25.0">
+            <span class="model-qty">2台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 060HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 053HD-SE</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 025HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 020HD-SE</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 028HD-SE</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 070HD-SE</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 100HD-SE</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 330HD-SE</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">SQP 008HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">HQP 400HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">SQP 016HD</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">WU4 700T</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">WU4 900T</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-bar-item">
+        <span class="model-name">WU8 2400T</span>
+        <div class="model-bar-container">
+          <div class="model-bar blue" style="width: 12.5%;" data-width="12.5">
+            <span class="model-qty">1台</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Sales Completion Gauge -->
+    <div class="chart-container">
+      <div class="chart-title">指标完成率</div>
+      <div class="donut-container">
+        <div>
+          <div class="donut-gauge">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="donut-bg" cx="70" cy="70" r="60"></circle>
+              <!-- 85/71=120% 超额完成，显示满圈+截断 -->
+              <circle class="donut-progress green" cx="70" cy="70" r="60" data-percent="100" style="stroke-dashoffset: 0;"></circle>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-value" style="color: var(--accent-green);">120%</div>
+              <div class="donut-label">月度完成率</div>
+            </div>
+          </div>
+          <p style="text-align:center;font-size:0.7rem;color:var(--text-secondary);margin-top:6px;">预估71台 → 实际85台</p>
+        </div>
+        
+        <div>
+          <div class="donut-gauge">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="donut-bg" cx="70" cy="70" r="60"></circle>
+              <!-- 累计年度进度: 累计已知Q1=156台+85=241台 / 845 = 28.5% -->
+              <circle class="donut-progress cyan" cx="70" cy="70" r="60" data-percent="29" style="stroke-dashoffset: 267.664;"></circle>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-value">29%</div>
+              <div class="donut-label">年度进度</div>
+            </div>
+          </div>
+          <p style="text-align:center;font-size:0.7rem;color:var(--text-secondary);margin-top:6px;">1-4月累计241台 / 年目标845台</p>
+        </div>
+
+        <div>
+          <div class="donut-gauge">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="donut-bg" cx="70" cy="70" r="60"></circle>
+              <!-- 月均目标70台，完成85，超额 -->
+              <circle class="donut-progress orange" cx="70" cy="70" r="60" data-percent="83" style="stroke-dashoffset: 64.0885;"></circle>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-value" style="color: var(--accent-orange);">85</div>
+              <div class="donut-label">vs 月均目标</div>
+            </div>
+          </div>
+          <p style="text-align:center;font-size:0.7rem;color:var(--text-secondary);margin-top:6px;">月均目标≈70台（845÷12）</p>
+        </div>
+      </div>
+      <p style="text-align: center; color: var(--text-secondary); font-size: 0.75rem; margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+        全年目标: 845台 &nbsp;|&nbsp; 月均: 70台 &nbsp;|&nbsp; 4月预估: 71台 &nbsp;|&nbsp; 4月实际: 85台
+      </p>
+    </div>
+  </section>
+
+  <!-- Charts Row 2 -->
+  <section class="charts-section">
+    <!-- Industry Distribution -->
+    <div class="chart-container">
+      <div class="chart-title">行业分布</div>
+      <div class="horizontal-bar-chart" id="industryChart">
+      <div class="h-bar-item">
+        <span class="h-bar-label">汽车行业</span>
+        <div class="h-bar-track">
+          <div class="h-bar cyan" style="width: 100%;" data-width="100.0">
+            41台 (48.2%)
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">民品行业</span>
+        <div class="h-bar-track">
+          <div class="h-bar blue" style="width: 82.9%;" data-width="82.9">
+            34台 (40.0%)
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">家电行业</span>
+        <div class="h-bar-track">
+          <div class="h-bar purple" style="width: 14.6%;" data-width="14.6">
+            6台 (7.1%)
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">物流建材</span>
+        <div class="h-bar-track">
+          <div class="h-bar gold" style="width: 9.8%;" data-width="9.8">
+            4台 (4.7%)
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Region Distribution -->
+    <div class="chart-container">
+      <div class="chart-title">地区分布 (Top 8)</div>
+      <div class="horizontal-bar-chart" id="regionChart">
+      <div class="h-bar-item">
+        <span class="h-bar-label">武汉</span>
+        <div class="h-bar-track">
+          <div class="h-bar cyan" style="width: 100%;" data-width="100.0">
+            18台
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">浙江</span>
+        <div class="h-bar-track">
+          <div class="h-bar blue" style="width: 55.6%;" data-width="55.6">
+            10台
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">宁波</span>
+        <div class="h-bar-track">
+          <div class="h-bar purple" style="width: 50%;" data-width="50.0">
+            9台
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">墨西哥</span>
+        <div class="h-bar-track">
+          <div class="h-bar gold" style="width: 27.8%;" data-width="27.8">
+            5台
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">日本</span>
+        <div class="h-bar-track">
+          <div class="h-bar green" style="width: 22.2%;" data-width="22.2">
+            4台
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">湖南</span>
+        <div class="h-bar-track">
+          <div class="h-bar cyan" style="width: 22.2%;" data-width="22.2">
+            4台
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">土耳其</span>
+        <div class="h-bar-track">
+          <div class="h-bar blue" style="width: 22.2%;" data-width="22.2">
+            4台
+          </div>
+        </div>
+      </div>
+    
+      <div class="h-bar-item">
+        <span class="h-bar-label">青岛</span>
+        <div class="h-bar-track">
+          <div class="h-bar purple" style="width: 22.2%;" data-width="22.2">
+            4台
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Charts Row 3 -->
+  <section class="charts-section">
+    <!-- Office Distribution -->
+    <div class="chart-container">
+      <div class="chart-title">办事处销量</div>
+      <div class="office-grid" id="officeGrid">
+    <div class="office-item">
+      <div class="office-name">外贸</div>
+      <div class="office-qty">23</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">广州办</div>
+      <div class="office-qty">21</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">慈溪办</div>
+      <div class="office-qty">8</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">宁波办</div>
+      <div class="office-qty">6</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">台州办</div>
+      <div class="office-qty">5</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">青岛办</div>
+      <div class="office-qty">4</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">长沙办</div>
+      <div class="office-qty">4</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">天一办</div>
+      <div class="office-qty">3</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">上海办</div>
+      <div class="office-qty">2</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">南京办</div>
+      <div class="office-qty">2</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">重庆办</div>
+      <div class="office-qty">2</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">常州办</div>
+      <div class="office-qty">2</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">温州办</div>
+      <div class="office-qty">2</div>
+    </div>
+  
+    <div class="office-item">
+      <div class="office-name">合肥办</div>
+      <div class="office-qty">1</div>
+    </div>
+  </div>
+    </div>
+
+    <!-- Customer Table -->
+    <div class="chart-container">
+      <div class="chart-title">客户订单明细</div>
+      <div style="max-height: 300px; overflow-y: auto;">
+        <table class="customer-table">
+          <thead>
+            <tr>
+              <th>客户</th>
+              <th>地区</th>
+              <th>型号</th>
+              <th>数量</th>
+              <th>行业</th>
+              <th>办事处</th>
+            </tr>
+          </thead>
+          <tbody id="customerTable">
+    <tr>
+      <td>墨西哥</td>
+      <td>墨西哥</td>
+      <td>WU4 700T</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>墨西哥</td>
+      <td>墨西哥</td>
+      <td>WU8 2400T</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>墨西哥</td>
+      <td>墨西哥</td>
+      <td>HQP 210HD</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>墨西哥</td>
+      <td>墨西哥</td>
+      <td>HQP 160HD</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>思普宁</td>
+      <td>重庆</td>
+      <td>HQP 053HD</td>
+      <td>2台</td>
+      <td>汽车行业</td>
+      <td>重庆办</td>
+    </tr>
+  
+    <tr>
+      <td>顺兴</td>
+      <td>宁波</td>
+      <td>SQP 008HD</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>慈溪办</td>
+    </tr>
+  
+    <tr>
+      <td>顺兴</td>
+      <td>宁波</td>
+      <td>SQP 016HD</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>慈溪办</td>
+    </tr>
+  
+    <tr>
+      <td>顺兴</td>
+      <td>宁波</td>
+      <td>SQP 026HD</td>
+      <td>2台</td>
+      <td>民品行业</td>
+      <td>慈溪办</td>
+    </tr>
+  
+    <tr>
+      <td>华翔</td>
+      <td>成都</td>
+      <td>HQP 060HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>慈溪办</td>
+    </tr>
+  
+    <tr>
+      <td>华翔</td>
+      <td>成都</td>
+      <td>HQP 100HD</td>
+      <td>2台</td>
+      <td>汽车行业</td>
+      <td>慈溪办</td>
+    </tr>
+  
+    <tr>
+      <td>华翔</td>
+      <td>上海</td>
+      <td>HQP 047HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>慈溪办</td>
+    </tr>
+  
+    <tr>
+      <td>美国</td>
+      <td>美国</td>
+      <td>WU4 900T</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>美国</td>
+      <td>美国</td>
+      <td>WU8 1850T</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>格拉默</td>
+      <td>沈阳</td>
+      <td>HQP 100HD-SE</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>上海办</td>
+    </tr>
+  
+    <tr>
+      <td>东亚</td>
+      <td>武汉</td>
+      <td>HQP 240HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>广州办</td>
+    </tr>
+  
+    <tr>
+      <td>东亚</td>
+      <td>武汉</td>
+      <td>HQP 210HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>广州办</td>
+    </tr>
+  
+    <tr>
+      <td>东亚</td>
+      <td>武汉</td>
+      <td>HQP 180HD</td>
+      <td>3台</td>
+      <td>汽车行业</td>
+      <td>广州办</td>
+    </tr>
+  
+    <tr>
+      <td>东亚</td>
+      <td>武汉</td>
+      <td>HQP 100HD</td>
+      <td>4台</td>
+      <td>汽车行业</td>
+      <td>广州办</td>
+    </tr>
+  
+    <tr>
+      <td>东亚</td>
+      <td>武汉</td>
+      <td>HQP 140HD</td>
+      <td>8台</td>
+      <td>汽车行业</td>
+      <td>广州办</td>
+    </tr>
+  
+    <tr>
+      <td>富强</td>
+      <td>浙江</td>
+      <td>HQP 240HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>广州办</td>
+    </tr>
+  
+    <tr>
+      <td>富强</td>
+      <td>浙江</td>
+      <td>HQP 160HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>广州办</td>
+    </tr>
+  
+    <tr>
+      <td>富强</td>
+      <td>浙江</td>
+      <td>HQP 130HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>广州办</td>
+    </tr>
+  
+    <tr>
+      <td>富强</td>
+      <td>广东</td>
+      <td>HQP 210HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>广州办</td>
+    </tr>
+  
+    <tr>
+      <td>柏源</td>
+      <td>南通</td>
+      <td>HQP 130HD</td>
+      <td>2台</td>
+      <td>汽车行业</td>
+      <td>常州办</td>
+    </tr>
+  
+    <tr>
+      <td>海尔</td>
+      <td>青岛</td>
+      <td>HQP 070HD-SE</td>
+      <td>1台</td>
+      <td>家电行业</td>
+      <td>青岛办</td>
+    </tr>
+  
+    <tr>
+      <td>海尔</td>
+      <td>青岛</td>
+      <td>HQP 120HD-SE</td>
+      <td>2台</td>
+      <td>家电行业</td>
+      <td>青岛办</td>
+    </tr>
+  
+    <tr>
+      <td>海尔</td>
+      <td>青岛</td>
+      <td>HQP 053HD-SE</td>
+      <td>1台</td>
+      <td>家电行业</td>
+      <td>青岛办</td>
+    </tr>
+  
+    <tr>
+      <td>零跑</td>
+      <td>金华</td>
+      <td>HQP 400HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>天一办</td>
+    </tr>
+  
+    <tr>
+      <td>零跑</td>
+      <td>金华</td>
+      <td>HQP 330HD</td>
+      <td>2台</td>
+      <td>汽车行业</td>
+      <td>天一办</td>
+    </tr>
+  
+    <tr>
+      <td>美森</td>
+      <td>浙江</td>
+      <td>HQP 020HD-SE</td>
+      <td>1台</td>
+      <td>家电行业</td>
+      <td>温州办</td>
+    </tr>
+  
+    <tr>
+      <td>美森</td>
+      <td>浙江</td>
+      <td>HQP 028HD-SE</td>
+      <td>1台</td>
+      <td>家电行业</td>
+      <td>温州办</td>
+    </tr>
+  
+    <tr>
+      <td>浩博</td>
+      <td>安徽</td>
+      <td>HQP 240HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>南京办</td>
+    </tr>
+  
+    <tr>
+      <td>浩博</td>
+      <td>安徽</td>
+      <td>HQP 180HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>南京办</td>
+    </tr>
+  
+    <tr>
+      <td>敏实</td>
+      <td>塞尔维亚</td>
+      <td>HQP 240HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>敏实</td>
+      <td>墨西哥</td>
+      <td>HQP 130HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>敏实</td>
+      <td>清远</td>
+      <td>HQP 330HD</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>宁波办</td>
+    </tr>
+  
+    <tr>
+      <td>德国</td>
+      <td>德国</td>
+      <td>HQP 020HD</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>捷克</td>
+      <td>捷克</td>
+      <td>HQP 038HD</td>
+      <td>2台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>新泉</td>
+      <td>美国</td>
+      <td>WU8 1850T</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>中联重科 <span style="font-size:0.6rem;background:var(--accent-orange);color:#fff;padding:1px 4px;border-radius:3px;vertical-align:middle;">新</span></td>
+      <td>湖南</td>
+      <td>HQP 012HD</td>
+      <td>1台</td>
+      <td>物流建材</td>
+      <td>长沙办</td>
+    </tr>
+  
+    <tr>
+      <td>中联重科 <span style="font-size:0.6rem;background:var(--accent-orange);color:#fff;padding:1px 4px;border-radius:3px;vertical-align:middle;">新</span></td>
+      <td>湖南</td>
+      <td>HQP 020HD</td>
+      <td>1台</td>
+      <td>物流建材</td>
+      <td>长沙办</td>
+    </tr>
+  
+    <tr>
+      <td>中联重科 <span style="font-size:0.6rem;background:var(--accent-orange);color:#fff;padding:1px 4px;border-radius:3px;vertical-align:middle;">新</span></td>
+      <td>湖南</td>
+      <td>HQP 047HD</td>
+      <td>1台</td>
+      <td>物流建材</td>
+      <td>长沙办</td>
+    </tr>
+  
+    <tr>
+      <td>中联重科 <span style="font-size:0.6rem;background:var(--accent-orange);color:#fff;padding:1px 4px;border-radius:3px;vertical-align:middle;">新</span></td>
+      <td>湖南</td>
+      <td>HQP 180HD</td>
+      <td>1台</td>
+      <td>物流建材</td>
+      <td>长沙办</td>
+    </tr>
+  
+    <tr>
+      <td>远景体育</td>
+      <td>浙江</td>
+      <td>HQP 016HD</td>
+      <td>2台</td>
+      <td>民品行业</td>
+      <td>台州办</td>
+    </tr>
+  
+    <tr>
+      <td>远景体育</td>
+      <td>浙江</td>
+      <td>HQP 012HD</td>
+      <td>3台</td>
+      <td>民品行业</td>
+      <td>台州办</td>
+    </tr>
+  
+    <tr>
+      <td>道生硅胶 <span style="font-size:0.6rem;background:var(--accent-orange);color:#fff;padding:1px 4px;border-radius:3px;vertical-align:middle;">新</span></td>
+      <td>宁波</td>
+      <td>HQP 025HD</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>宁波办</td>
+    </tr>
+  
+    <tr>
+      <td>日本 <span style="font-size:0.6rem;background:var(--accent-orange);color:#fff;padding:1px 4px;border-radius:3px;vertical-align:middle;">新</span></td>
+      <td>日本</td>
+      <td>HQP 020HD</td>
+      <td>2台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>日本 <span style="font-size:0.6rem;background:var(--accent-orange);color:#fff;padding:1px 4px;border-radius:3px;vertical-align:middle;">新</span></td>
+      <td>日本</td>
+      <td>HQP 012HD</td>
+      <td>2台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>土耳其</td>
+      <td>土耳其</td>
+      <td>HQP 280HD</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>土耳其</td>
+      <td>土耳其</td>
+      <td>HQP 047HD</td>
+      <td>3台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>巴西</td>
+      <td>巴西</td>
+      <td>HQP 032HD</td>
+      <td>2台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>燎原</td>
+      <td>武汉</td>
+      <td>HQP 330HD-SE</td>
+      <td>1台</td>
+      <td>汽车行业</td>
+      <td>上海办</td>
+    </tr>
+  
+    <tr>
+      <td>意大利</td>
+      <td>意大利</td>
+      <td>HQP 180HD</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>外贸</td>
+    </tr>
+  
+    <tr>
+      <td>天马</td>
+      <td>合肥</td>
+      <td>HQP 280HD</td>
+      <td>1台</td>
+      <td>民品行业</td>
+      <td>合肥办</td>
+    </tr>
+  
+    <tr>
+      <td>精成电机</td>
+      <td>宁波</td>
+      <td>HQP 028HD</td>
+      <td>4台</td>
+      <td>民品行业</td>
+      <td>宁波办</td>
+    </tr>
+  </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- YoY Comparison Section -->
+  <section class="charts-section" style="grid-template-columns: 1fr;">
+    <div class="chart-container">
+      <div class="chart-title">同比对比：2025年4月 vs 2026年4月</div>
+      <div id="yoyCompareSection">
+    <div class="yoy-grid">
+      <!-- Overall -->
+      <div class="yoy-card">
+        <div class="yoy-card-title">总量对比</div>
+        <div class="yoy-row">
+          <span class="label">2025年4月</span>
+          <span class="val25">96台</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label">2026年4月</span>
+          <span class="val26">85台</span>
+          <span class="delta down">▼ -11.5%</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label">外贸</span>
+          <span class="val25">23台</span>
+          <span class="val26">23台 <span class="delta flat">→ 持平</span></span>
+        </div>
+        <div class="yoy-row">
+          <span class="label">内贸</span>
+          <span class="val25">73台</span>
+          <span class="val26">62台 <span class="delta down">▼ -15.1%</span></span>
+        </div>
+      </div>
+
+      <!-- Industry -->
+      <div class="yoy-card">
+        <div class="yoy-card-title">行业结构对比</div>
+        <div class="yoy-row">
+          <span class="label">汽车行业</span>
+          <span class="val25">13台(13.5%)</span>
+          <span class="val26">41台(48.2%)</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label">民品行业</span>
+          <span class="val25">54台(56.3%)</span>
+          <span class="val26">34台(40.0%)</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label">电子行业</span>
+          <span class="val25" style="color:var(--accent-gold);">25台(26.0%)</span>
+          <span class="val26" style="color:var(--accent-red);">0台</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label">家电行业</span>
+          <span class="val25">0台</span>
+          <span class="val26">6台</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label">物流建材</span>
+          <span class="val25">4台</span>
+          <span class="val26">4台</span>
+        </div>
+      </div>
+
+      <!-- Key clients diff -->
+      <div class="yoy-card">
+        <div class="yoy-card-title">客户台量差异（关键变化）</div>
+        <div class="yoy-row">
+          <span class="label" style="color:var(--accent-red);">↓ 三诺（25年）</span>
+          <span class="val25" style="color:var(--accent-gold);">25台</span>
+          <span class="val26" style="color:var(--accent-red);">无订单</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label" style="color:var(--accent-red);">↓ 中赢（25年）</span>
+          <span class="val25" style="color:var(--accent-gold);">12台</span>
+          <span class="val26" style="color:var(--accent-red);">无订单</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label" style="color:var(--accent-red);">↓ 海程（25年）</span>
+          <span class="val25" style="color:var(--accent-gold);">10台</span>
+          <span class="val26" style="color:var(--accent-red);">无订单</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label" style="color:var(--accent-green);">↑ 东亚（26年）</span>
+          <span class="val25">无订单</span>
+          <span class="val26" style="color:var(--accent-green);">17台</span>
+        </div>
+        <div class="yoy-row">
+          <span class="label" style="color:var(--accent-red);">↓ 威士茂（25年外贸）</span>
+          <span class="val25" style="color:var(--accent-gold);">18台</span>
+          <span class="val26" style="color:var(--accent-red);">无订单</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Foreign detail comparison -->
+    <div style="margin-top:4px;">
+      <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px;padding-left:4px;">
+        外贸台量同为23台，但客户结构发生变化：2025年威士茂单家贡献18台（集中），2026年分散于10个国家/客户（多元化）
+      </div>
+      <div class="foreign-detail">
+        <div>
+          <div class="fd-col-title">2025年4月外贸（23台）</div>
+          
+            <div class="fd-row">
+              <span class="fd-cust">威士茂</span>
+              <span class="fd-region">马来西亚</span>
+              <span class="fd-qty">18台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">西班牙</span>
+              <span class="fd-region">西班牙</span>
+              <span class="fd-qty">3台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">意大利</span>
+              <span class="fd-region">土耳其</span>
+              <span class="fd-qty">1台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">格力博</span>
+              <span class="fd-region">越南</span>
+              <span class="fd-qty">1台</span>
+            </div>
+        </div>
+        <div>
+          <div class="fd-col-title">2026年4月外贸（23台）</div>
+          
+            <div class="fd-row">
+              <span class="fd-cust">土耳其</span>
+              <span class="fd-region">土耳其</span>
+              <span class="fd-qty">4台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">日本</span>
+              <span class="fd-region">日本</span>
+              <span class="fd-qty">4台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">墨西哥</span>
+              <span class="fd-region">墨西哥</span>
+              <span class="fd-qty">4台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">巴西</span>
+              <span class="fd-region">巴西</span>
+              <span class="fd-qty">2台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">捷克</span>
+              <span class="fd-region">捷克</span>
+              <span class="fd-qty">2台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">敏实</span>
+              <span class="fd-region">多国</span>
+              <span class="fd-qty">2台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">新泉</span>
+              <span class="fd-region">美国</span>
+              <span class="fd-qty">1台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">美国</span>
+              <span class="fd-region">美国</span>
+              <span class="fd-qty">2台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">德国</span>
+              <span class="fd-region">德国</span>
+              <span class="fd-qty">1台</span>
+            </div>
+            <div class="fd-row">
+              <span class="fd-cust">意大利</span>
+              <span class="fd-region">意大利</span>
+              <span class="fd-qty">1台</span>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </section>
+
+  <!-- New Customers Section -->
+  <section class="charts-section" style="grid-template-columns: 1fr;">
+    <div class="chart-container">
+      <div class="chart-title">4月新增客户（对比2021-2025年历史406家客户）</div>
+      <div class="nc-summary">
+        <div class="nc-summary-item">
+          <span class="nc-s-val">3</span>
+          <span class="nc-s-label">新增客户数</span>
+        </div>
+        <div class="nc-summary-item">
+          <span class="nc-s-val">9台</span>
+          <span class="nc-s-label">新客户贡献</span>
+        </div>
+        <div class="nc-summary-item">
+          <span class="nc-s-val">10.6%</span>
+          <span class="nc-s-label">新客户占比</span>
+        </div>
+        <div class="nc-summary-item">
+          <span class="nc-s-val">3.0台</span>
+          <span class="nc-s-label">平均台量/客户</span>
+        </div>
+      </div>
+      <div class="new-customer-grid" id="newCustomerGrid">
+      <div class="new-cust-card">
+        <span class="nc-badge">NEW</span>
+        <div class="new-cust-name">中联重科</div>
+        <div class="new-cust-qty">4<span> 台</span></div>
+        <div class="new-cust-meta">
+          <span class="nc-tag industry" style="color:#10b981;background:#10b98122">物流建材</span>
+          <span class="nc-tag region-domestic">内贸</span>
+          <span class="nc-tag">长沙办</span>
+        </div>
+      </div>
+    
+      <div class="new-cust-card">
+        <span class="nc-badge">NEW</span>
+        <div class="new-cust-name">日本</div>
+        <div class="new-cust-qty">4<span> 台</span></div>
+        <div class="new-cust-meta">
+          <span class="nc-tag industry" style="color:#8b5cf6;background:#8b5cf622">民品行业</span>
+          <span class="nc-tag region-foreign">外贸</span>
+          <span class="nc-tag">外贸</span>
+        </div>
+      </div>
+    
+      <div class="new-cust-card">
+        <span class="nc-badge">NEW</span>
+        <div class="new-cust-name">道生硅胶</div>
+        <div class="new-cust-qty">1<span> 台</span></div>
+        <div class="new-cust-meta">
+          <span class="nc-tag industry" style="color:#8b5cf6;background:#8b5cf622">民品行业</span>
+          <span class="nc-tag region-domestic">内贸</span>
+          <span class="nc-tag">宁波办</span>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Analysis Summary Section -->
+  <section class="charts-section" style="grid-template-columns: 1fr;">
+    <div class="chart-container">
+      <div class="chart-title">分析总结：2026年4月较2025年下滑原因</div>
+      <div id="analysisSummary">
+    <div class="analysis-block">
+      <div class="analysis-item warn">
+        <div class="analysis-icon">📉</div>
+        <div class="analysis-body">
+          <div class="analysis-title">主因 ① 电子行业大客户缺失：-25台</div>
+          <div class="analysis-desc">
+            2025年4月<strong>三诺（深圳）</strong>单家贡献<strong>25台</strong>电子行业订单（HQP 038HD×9台 + HQP 053HD×14台 + HQP 065HD×2台），是当月最大单一客户。2026年4月三诺未下单，电子行业订单<strong>归零</strong>。这一项损失直接贡献了同比降幅的主要部分。
+          </div>
+        </div>
+      </div>
+
+      <div class="analysis-item warn">
+        <div class="analysis-icon">📉</div>
+        <div class="analysis-body">
+          <div class="analysis-title">主因 ② 内贸民品集中大单未延续：-22台</div>
+          <div class="analysis-desc">
+            2025年4月<strong>中赢（天津）12台</strong>、<strong>海程（芜湖）10台</strong>构成内贸民品重要支撑，合计22台。2026年4月两家均无订单。内贸从73台降至62台（-15.1%），剔除东亚新增17台贡献后，内贸老客户实际流失更多，被东亚大单部分弥补。
+          </div>
+        </div>
+      </div>
+
+      <div class="analysis-item ok">
+        <div class="analysis-icon">✅</div>
+        <div class="analysis-body">
+          <div class="analysis-title">积极因素 ① 外贸台量持平，但结构更健康</div>
+          <div class="analysis-desc">
+            外贸同比持平（23台），但2025年过度依赖<strong>威士茂单家18台</strong>（占外贸78%），2026年则分散至墨西哥、日本、土耳其、巴西等<strong>10个国家/客户</strong>，抗风险能力显著提升，外贸结构更加多元化。
+          </div>
+        </div>
+      </div>
+
+      <div class="analysis-item ok">
+        <div class="analysis-icon">✅</div>
+        <div class="analysis-body">
+          <div class="analysis-title">积极因素 ② 汽车行业大幅增长，东亚贡献突出</div>
+          <div class="analysis-desc">
+            2026年汽车行业从13台跃升至<strong>41台（+215%）</strong>，<strong>东亚武汉</strong>单家贡献17台，成为26年4月最大内贸客户。汽车行业占比从13.5%升至48.2%，结构性向高价值行业集中，有助于稳定均价。
+          </div>
+        </div>
+      </div>
+
+      <div class="analysis-item note">
+        <div class="analysis-icon">📌</div>
+        <div class="analysis-body">
+          <div class="analysis-title">结论：订单集中度问题，非趋势性下滑</div>
+          <div class="analysis-desc">
+            本月下滑<strong>11台（-11.5%）</strong>的根本原因是2025年4月存在<strong>三诺+中赢+海程</strong>三个偶发性集中大单（合计47台，占当年4月48.9%），拉高了基数。2026年4月无同等量级集中单，但汽车行业上量、外贸多元化均是正向信号。建议关注三诺、中赢等客户的后续跟进情况。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </section>
+
+</div>
+
+
+
+
+
+</body></html>
